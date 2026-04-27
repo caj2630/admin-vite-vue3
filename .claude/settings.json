@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s http://localhost:3333/api/system/roles)",
+      "Bash(curl -s 'http://localhost:3333/api/system/roles')",
+      "Bash(kill 97822)",
+      "Bash(npx ts-node *)",
+      "Bash(curl -s 'http://localhost:3333/api/system/users?page=1&pageSize=3')",
+      "Bash(curl -s -X POST 'http://localhost:3333/api/system/users' -H 'Content-Type: application/json' -d '{\"username\":\"testuser\",\"nickName\":\"测试用户\",\"roleIds\":[3]}')",
+      "Bash(curl -s 'http://localhost:3333/api/system/users?keywords=admin')",
+      "Bash(curl -s -X PUT 'http://localhost:3333/api/system/users/status' -H 'Content-Type: application/json' -d '{\"ids\":[7],\"status\":1}')",
+      "Bash(curl -s -X PUT 'http://localhost:3333/api/system/users/3/roles' -H 'Content-Type: application/json' -d '{\"roleIds\":[2,3]}')",
+      "Bash(curl -s -X PUT 'http://localhost:3333/api/system/users/3/password' -H 'Content-Type: application/json' -d '{\"newPassword\":\"654321\",\"confirmPassword\":\"654321\"}')",
+      "Bash(curl -s -X DELETE 'http://localhost:3333/api/system/users' -H 'Content-Type: application/json' -d '{\"ids\":[101]}')",
+      "Bash(curl -s 'http://localhost:3333/api/system/users?status=0')",
+      "Bash(npx tsc *)",
+      "WebFetch(domain:localhost)",
+      "Bash(curl -s http://localhost:5173/)",
+      "Bash(curl -s http://localhost:5173/src/main.ts)",
+      "Bash(curl -s http://localhost:5173/@vite/client)",
+      "Bash(curl -s http://localhost:5173/src/App.vue)",
+      "Bash(curl -s http://localhost:5173/src/router/index.ts)",
+      "Bash(curl -s http://localhost:5173/src/components/Layout.vue)",
+      "Bash(curl -s http://localhost:5173/src/views/login/index.vue)",
+      "Bash(curl -s http://localhost:5173/src/stores/permission.ts)",
+      "Bash(curl -s http://localhost:5173/src/router/permission.ts)",
+      "Bash(git -C /Volumes/smartT7/code/ai/vite-vue3 diff src/service/index.ts)",
+      "Bash(curl -s http://localhost:5173/src/views/login/user.vue)",
+      "Bash(curl -s http://localhost:5173/src/views/home/index.vue)",
+      "Bash(kill %1)",
+      "Bash(wait %1)"
+    ]
+  }
+}

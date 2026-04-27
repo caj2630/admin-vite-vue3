@@ -3,6 +3,7 @@ import dotenv from 'dotenv'
 import { fileURLToPath } from 'url'
 import { dirname, resolve } from 'path'
 import { createSupabaseClient } from './supabase.ts'
+import userRoutes from './routes/user.ts'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -88,6 +89,8 @@ router.post('/register', async (req, res) => {
   })
 })
 
+router.use(userRoutes)
+
 router.get('/list', async (req, res) => {
   res.json({
     data: [
@@ -100,10 +103,7 @@ router.get('/list', async (req, res) => {
 })
 
 router.get('/menus', async (req, res) => {
-  const { data, error } = await supabase
-    .from('menus')
-    .select('*')
-    .order('order')
+  const { data, error } = await supabase.from('menus').select('*').order('order')
 
   if (error) {
     return res.status(500).json({ error: error.message })
@@ -112,10 +112,10 @@ router.get('/menus', async (req, res) => {
   // 构建树形结构
   const buildTree = (items: any[], parentId: string | null = null): any[] => {
     return items
-      .filter(item => item.parent_id === parentId)
-      .map(item => ({
+      .filter((item) => item.parent_id === parentId)
+      .map((item) => ({
         ...item,
-        children: buildTree(items, item.id)
+        children: buildTree(items, item.id),
       }))
   }
 

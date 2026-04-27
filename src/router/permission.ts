@@ -34,7 +34,6 @@ router.beforeEach(async (to, from, next) => {
       }
       NProgress.done()
     } else {
-      debugger
       // 判断是否已获取过路由
       const hasRoutes = permissionStore.routes && permissionStore.routes.length > 0
       if (!hasRoutes) {

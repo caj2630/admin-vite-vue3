@@ -90,4 +90,12 @@ export function post<T = any>(url: string, data?: any, config?: AxiosRequestConf
   return service.post<T>(url, data, config) as Promise<T>
 }
 
+export function put<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+  return service.put<T>(url, data, config) as Promise<T>
+}
+
+export function del<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
+  return service.delete<T>(url, config) as Promise<T>
+}
+
 export default service
