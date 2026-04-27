@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import nameSpace from './name-space'
-import { setToken } from '@/service'
+// import { setToken } from '@/service'
 
 export const useUserInfoStore = defineStore(
   nameSpace.USER,
@@ -22,6 +22,6 @@ export const useUserInfoStore = defineStore(
     return { user, token, resetToken }
   },
   {
-    persist: true // 开启持久化
+    persist: true, // 开启持久化
   },
 )

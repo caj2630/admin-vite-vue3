@@ -17,7 +17,8 @@ app.use(pinia)
 
 app.use(router)
 pinia.use(
-  createPersistedState({ // 设置全局不开启持久化，单独在需要持久化的 store 中开启
+  createPersistedState({
+    // 设置全局不开启持久化，单独在需要持久化的 store 中开启
     auto: false,
   }),
 )

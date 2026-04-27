@@ -1,9 +1,9 @@
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import nameSpace from './name-space'
 import { ElMessage } from 'element-plus'
 import { get } from '@/service'
-import router from '@/router/index.ts';
+import router from '@/router/index.ts'
 
 interface MenuItem {
   id?: number | string
@@ -27,13 +27,16 @@ const getComponentByPath = (menuPath) => {
   const cleanPath = menuPath?.replace?.(/^\//, '')
   // 构建完整路径
   const componentPath = `/src/views/${cleanPath}/index.vue`
-  
+
   // 从映射中获取组件
   if (modules[componentPath]) {
     return modules[componentPath]
   } else {
     console.warn(`组件路径不存在: ${componentPath}`)
-    return modules['/src/views/templateError/notFound.vue'] || (() => import('@/views/templateError/notFound.vue'))
+    return (
+      modules['/src/views/templateError/notFound.vue'] ||
+      (() => import('@/views/templateError/notFound.vue'))
+    )
   }
 }
 export const usePermissionStore = defineStore(
@@ -54,7 +57,7 @@ export const usePermissionStore = defineStore(
           return
         }
         // 检查路由是否已存在
-        const existingRoute = router.getRoutes().find(r => r.path === menu.path)
+        const existingRoute = router.getRoutes().find((r) => r.path === menu.path)
         if (!existingRoute) {
           try {
             router.addRoute('Layout', {
@@ -64,8 +67,8 @@ export const usePermissionStore = defineStore(
               meta: {
                 title: menu.title || menu.name,
                 requiresPermission: true,
-                dynamic: true
-              }
+                dynamic: true,
+              },
             })
           } catch (error) {
             console.error(`添加路由失败: ${menu.path}`, error)
@@ -83,7 +86,6 @@ export const usePermissionStore = defineStore(
       try {
         const result = await get<{ data: MenuItem[] }>('/api/menus')
         if (result.data && Array.isArray(result.data)) {
-          
           // 过滤无效的菜单项，确保每个菜单项都有必要字段
           // const data = result.data?.map(menu => {
           //   return {
@@ -121,7 +123,7 @@ export const usePermissionStore = defineStore(
     const generateRoutes = async () => {
       await fetchMenus()
     }
-    return { permission, routes, generateRoutes, isLoading, menus, fetchMenus, addRoutesToRouter}
+    return { permission, routes, generateRoutes, isLoading, menus, fetchMenus, addRoutesToRouter }
   },
   {
     // persist: true // 开启持久化

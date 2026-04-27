@@ -1,5 +1,4 @@
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <div class="home-content">
@@ -43,38 +42,38 @@
 </template>
 
 <style scoped lang="scss">
-.home-content {
-  h1 {
-    margin-bottom: 20px;
-    color: #333;
-  }
-
-  .content-box {
-    .box-card {
-      :deep(.el-card__header) {
-        border-bottom: 1px solid #ebeef5;
-      }
+  .home-content {
+    h1 {
+      margin-bottom: 20px;
+      color: #333;
     }
 
-    .stat-card {
-      text-align: center;
-      padding: 20px;
-      background-color: #f5f7fa;
-      border-radius: 4px;
-      border: 1px solid #e6e6e6;
-
-      .stat-value {
-        font-size: 32px;
-        font-weight: bold;
-        color: #409eff;
-        margin-bottom: 10px;
+    .content-box {
+      .box-card {
+        :deep(.el-card__header) {
+          border-bottom: 1px solid #ebeef5;
+        }
       }
 
-      .stat-label {
-        font-size: 14px;
-        color: #666;
+      .stat-card {
+        text-align: center;
+        padding: 20px;
+        background-color: #f5f7fa;
+        border-radius: 4px;
+        border: 1px solid #e6e6e6;
+
+        .stat-value {
+          font-size: 32px;
+          font-weight: bold;
+          color: #409eff;
+          margin-bottom: 10px;
+        }
+
+        .stat-label {
+          font-size: 14px;
+          color: #666;
+        }
       }
     }
   }
-}
 </style>

@@ -14,6 +14,6 @@ export const useMenuStore = defineStore(
     return { component, setComponents }
   },
   {
-    persist: true // 开启持久化
+    persist: true, // 开启持久化
   },
 )
