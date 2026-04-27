@@ -1,0 +1,29 @@
+$namespace: 'cy' !default;
+$block-sel: '-' !default;
+$elem-sel: '__' !default;
+$mod-sel: '--' !default;
+
+@mixin b($block) {
+  $B: #{$namespace + $block-sel + $block};
+  .#{$B} {
+    @content;
+  }
+}
+
+@mixin e($el) {
+  $select: &;
+  @at-root {
+    #{$select + $elem-sel + $el} {
+      @content;
+    }
+  }
+}
+
+@mixin m($mod) {
+  $select: &;
+  @at-root {
+    #{$select + $mod-sel + $mod} {
+      @content;
+    }
+  }
+}
