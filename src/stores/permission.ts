@@ -10,7 +10,7 @@ interface MenuItem {
   path: string
   name: string
   title?: string
-  component: string
+  component: string | (() => Promise<any>)
   icon?: string
   children?: MenuItem[]
 }
@@ -22,7 +22,7 @@ interface RouteItem {
 }
 const modules = import.meta.glob('@/views/**/*.vue')
 console.log(modules, 'modules')
-const getComponentByPath = (menuPath) => {
+const getComponentByPath = (menuPath: string) => {
   // 移除开头的 /
   const cleanPath = menuPath?.replace?.(/^\//, '')
   // 构建完整路径

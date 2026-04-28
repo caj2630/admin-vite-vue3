@@ -1,53 +1,13 @@
 <template>
   <div class="app-container">
     <!-- 搜索表单 -->
-    <SearchForm :model="queryParams" @search="handleSearch" @reset="handleReset">
-      <el-form-item label="账号/昵称">
-        <el-input
-          v-model="queryParams.keywords"
-          placeholder="请输入账号或昵称"
-          clearable
-          @keyup.enter="handleSearch"
-        />
-      </el-form-item>
-      <el-form-item label="角色">
-        <el-select
-          v-model="queryParams.roleId"
-          placeholder="请选择角色"
-          clearable
-          style="width: 160px"
-        >
-          <el-option
-            v-for="role in roleOptions"
-            :key="role.id"
-            :label="role.roleName"
-            :value="role.id"
-          />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="账号状态">
-        <el-select
-          v-model="queryParams.status"
-          placeholder="请选择状态"
-          clearable
-          style="width: 120px"
-        >
-          <el-option label="正常" :value="1" />
-          <el-option label="禁用" :value="0" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="创建时间">
-        <el-date-picker
-          v-model="timeRange"
-          type="daterange"
-          range-separator="至"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
-          value-format="YYYY-MM-DD"
-          @change="handleTimeRangeChange"
-        />
-      </el-form-item>
-    </SearchForm>
+    <SearchForm
+      :model="queryParams"
+      :items="searchItems"
+      @search="handleSearch"
+      @reset="handleReset"
+      @update:model="handleUpdateModel"
+    />
 
     <!-- 数据表格 -->
     <ProTable
@@ -375,8 +335,9 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, reactive, onMounted } from 'vue'
+  import { ref, reactive, watch, onMounted } from 'vue'
   import { SearchForm, ProTable } from '@/components/table'
+  import type { SearchFormItem } from '@/components/table/search-form.vue'
   import { ElMessage, ElMessageBox } from 'element-plus'
   import type { FormInstance } from 'element-plus'
   import {
@@ -401,10 +362,41 @@
 
   // ==================== 角色选项 ====================
   const roleOptions = ref<RoleInfo[]>([])
+
+  // ==================== 搜索配置 ====================
+  const searchItems = ref<SearchFormItem[]>([
+    { type: 'input', label: '账号/昵称', prop: 'keywords', placeholder: '请输入账号或昵称' },
+    { type: 'select', label: '角色', prop: 'roleId', placeholder: '请选择角色', options: [] },
+    {
+      type: 'select',
+      label: '账号状态',
+      prop: 'status',
+      placeholder: '请选择状态',
+      options: [
+        { label: '正常', value: 1 },
+        { label: '禁用', value: 0 },
+      ],
+    },
+    {
+      type: 'date',
+      label: '创建时间',
+      prop: 'timeRange',
+      dateType: 'daterange',
+      startPlaceholder: '开始日期',
+      endPlaceholder: '结束日期',
+      rangeSeparator: '至',
+    },
+  ])
+
   const fetchRoles = async () => {
     try {
       const res = await getRoleList()
       roleOptions.value = res.data
+      // 更新搜索项的角色下拉选项
+      const roleField = searchItems.value.find((item) => item.prop === 'roleId')
+      if (roleField && roleField.type === 'select') {
+        roleField.options = roleOptions.value.map((r) => ({ label: r.roleName, value: r.id }))
+      }
     } catch {
       // 静默失败，下拉为空时不影响使用
     }
@@ -415,27 +407,30 @@
   const userList = ref<UserInfo[]>([])
   const total = ref(0)
   const selectedIds = ref<number[]>([])
-  const timeRange = ref<string[]>([])
 
-  const queryParams = reactive<UserQueryParams>({
+  const queryParams = reactive<UserQueryParams & { timeRange: string[] }>({
     keywords: '',
     roleId: undefined,
     status: undefined,
+    timeRange: [],
     beginTime: undefined,
     endTime: undefined,
     page: 1,
     pageSize: 20,
   })
 
-  const handleTimeRangeChange = (val: string[] | null) => {
-    if (val && val.length === 2) {
-      queryParams.beginTime = val[0]
-      queryParams.endTime = val[1]
-    } else {
-      queryParams.beginTime = undefined
-      queryParams.endTime = undefined
-    }
-  }
+  watch(
+    () => queryParams.timeRange,
+    (val) => {
+      if (val && val.length === 2) {
+        queryParams.beginTime = val[0]
+        queryParams.endTime = val[1]
+      } else {
+        queryParams.beginTime = undefined
+        queryParams.endTime = undefined
+      }
+    },
+  )
 
   const fetchData = async () => {
     loading.value = true
@@ -459,15 +454,19 @@
     queryParams.keywords = ''
     queryParams.roleId = undefined
     queryParams.status = undefined
+    queryParams.timeRange = []
     queryParams.beginTime = undefined
     queryParams.endTime = undefined
-    timeRange.value = []
     queryParams.page = 1
     fetchData()
   }
 
   const handleSelectionChange = (rows: UserInfo[]) => {
     selectedIds.value = rows.map((r) => r.userId)
+  }
+
+  const handleUpdateModel = (prop: string, value: unknown) => {
+    ;(queryParams as Record<string, unknown>)[prop] = value
   }
 
   // ==================== 新增 / 编辑 ====================
@@ -658,8 +657,11 @@
       // 更新列表中的角色显示
       const idx = userList.value.findIndex((u) => u.userId === targetUser.userId)
       if (idx !== -1 && res.data) {
-        userList.value[idx].roleIds = res.data.roleIds
-        userList.value[idx].roleNames = res.data.roleNames
+        const user = userList.value[idx]
+        if (user) {
+          user.roleIds = res.data?.roleIds ?? ''
+          user.roleNames = res.data?.roleNames ?? ''
+        }
       }
       ElMessage.success('角色分配成功')
       assignRoleVisible.value = false
@@ -681,7 +683,11 @@
     confirmPassword: '',
   })
 
-  const validateConfirmPassword = (_rule: any, value: string, callback: any) => {
+  const validateConfirmPassword = (
+    _rule: unknown,
+    value: string,
+    callback: (error?: Error | string) => void,
+  ) => {
     if (value && value !== resetPwdForm.newPassword) {
       callback(new Error('两次输入的密码不一致'))
     } else {
