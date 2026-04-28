@@ -1,198 +1,169 @@
 <template>
   <div class="app-container">
     <!-- 搜索表单 -->
-    <el-card shadow="never" class="search-card">
-      <el-form :model="queryParams" inline>
-        <el-form-item label="账号/昵称">
-          <el-input
-            v-model="queryParams.keywords"
-            placeholder="请输入账号或昵称"
-            clearable
-            @keyup.enter="handleSearch"
+    <SearchForm :model="queryParams" @search="handleSearch" @reset="handleReset">
+      <el-form-item label="账号/昵称">
+        <el-input
+          v-model="queryParams.keywords"
+          placeholder="请输入账号或昵称"
+          clearable
+          @keyup.enter="handleSearch"
+        />
+      </el-form-item>
+      <el-form-item label="角色">
+        <el-select
+          v-model="queryParams.roleId"
+          placeholder="请选择角色"
+          clearable
+          style="width: 160px"
+        >
+          <el-option
+            v-for="role in roleOptions"
+            :key="role.id"
+            :label="role.roleName"
+            :value="role.id"
           />
-        </el-form-item>
-        <el-form-item label="角色">
-          <el-select
-            v-model="queryParams.roleId"
-            placeholder="请选择角色"
-            clearable
-            style="width: 160px"
-          >
-            <el-option
-              v-for="role in roleOptions"
-              :key="role.id"
-              :label="role.roleName"
-              :value="role.id"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="账号状态">
-          <el-select
-            v-model="queryParams.status"
-            placeholder="请选择状态"
-            clearable
-            style="width: 120px"
-          >
-            <el-option label="正常" :value="1" />
-            <el-option label="禁用" :value="0" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="创建时间">
-          <el-date-picker
-            v-model="timeRange"
-            type="daterange"
-            range-separator="至"
-            start-placeholder="开始日期"
-            end-placeholder="结束日期"
-            value-format="YYYY-MM-DD"
-            @change="handleTimeRangeChange"
-          />
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="handleSearch">搜索</el-button>
-          <el-button @click="handleReset">重置</el-button>
-        </el-form-item>
-      </el-form>
-    </el-card>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="账号状态">
+        <el-select
+          v-model="queryParams.status"
+          placeholder="请选择状态"
+          clearable
+          style="width: 120px"
+        >
+          <el-option label="正常" :value="1" />
+          <el-option label="禁用" :value="0" />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="创建时间">
+        <el-date-picker
+          v-model="timeRange"
+          type="daterange"
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+          value-format="YYYY-MM-DD"
+          @change="handleTimeRangeChange"
+        />
+      </el-form-item>
+    </SearchForm>
 
-    <!-- 操作按钮 -->
-    <el-card shadow="never" class="table-card">
-      <div class="table-toolbar">
-        <div class="toolbar-left">
-          <el-button v-if="hasPerm('system:user:add')" type="primary" @click="openAddDialog">
-            新增用户
+    <!-- 数据表格 -->
+    <ProTable
+      v-model:page="queryParams.page"
+      v-model:page-size="queryParams.pageSize"
+      :loading="loading"
+      :data="userList"
+      :total="total"
+      @selection-change="handleSelectionChange"
+      @change="fetchData"
+    >
+      <template #toolbar>
+        <el-button v-if="hasPerm('system:user:add')" type="primary" @click="openAddDialog">
+          新增用户
+        </el-button>
+        <el-button
+          v-if="hasPerm('system:user:remove')"
+          :disabled="selectedIds.length === 0"
+          @click="handleBatchDelete"
+        >
+          批量删除
+        </el-button>
+        <el-button
+          v-if="hasPerm('system:user:edit')"
+          :disabled="selectedIds.length === 0"
+          @click="handleBatchStatus(1)"
+        >
+          批量启用
+        </el-button>
+        <el-button
+          v-if="hasPerm('system:user:edit')"
+          :disabled="selectedIds.length === 0"
+          @click="handleBatchStatus(0)"
+        >
+          批量禁用
+        </el-button>
+        <el-button v-if="hasPerm('system:user:export')" @click="handleExport"> 导出 </el-button>
+      </template>
+
+      <el-table-column type="selection" width="50" align="center" />
+      <el-table-column prop="userId" label="用户ID" width="80" align="center" />
+      <el-table-column prop="username" label="登录账号" min-width="120" />
+      <el-table-column prop="nickName" label="用户昵称" min-width="120" />
+      <el-table-column prop="phone" label="手机号" width="130" />
+      <el-table-column prop="email" label="邮箱" min-width="180" show-overflow-tooltip />
+      <el-table-column prop="roleNames" label="所属角色" min-width="140">
+        <template #default="{ row }">
+          <el-tag
+            v-for="name in row.roleNames"
+            :key="name"
+            size="small"
+            style="margin-right: 4px; margin-bottom: 2px"
+          >
+            {{ name }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="status" label="账号状态" width="100" align="center">
+        <template #default="{ row }">
+          <el-tag :type="row.status === 1 ? 'success' : 'danger'" size="small">
+            {{ row.status === 1 ? '正常' : '禁用' }}
+          </el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="createTime" label="创建时间" width="175" />
+      <el-table-column prop="loginTime" label="最后登录" width="175" />
+      <el-table-column label="操作" width="300" fixed="right">
+        <template #default="{ row }">
+          <el-button
+            v-if="hasPerm('system:user:edit')"
+            link
+            type="primary"
+            size="small"
+            @click="openEditDialog(row)"
+          >
+            编辑
           </el-button>
           <el-button
             v-if="hasPerm('system:user:remove')"
-            :disabled="selectedIds.length === 0"
-            @click="handleBatchDelete"
+            link
+            type="danger"
+            size="small"
+            @click="handleDelete(row)"
           >
-            批量删除
+            删除
+          </el-button>
+          <el-button
+            v-if="hasPerm('system:user:assign')"
+            link
+            type="primary"
+            size="small"
+            @click="openAssignRoleDialog(row)"
+          >
+            分配角色
+          </el-button>
+          <el-button
+            v-if="hasPerm('system:user:resetPwd')"
+            link
+            type="primary"
+            size="small"
+            @click="openResetPwdDialog(row)"
+          >
+            重置密码
           </el-button>
           <el-button
             v-if="hasPerm('system:user:edit')"
-            :disabled="selectedIds.length === 0"
-            @click="handleBatchStatus(1)"
+            link
+            :type="row.status === 1 ? 'warning' : 'success'"
+            size="small"
+            @click="handleToggleStatus(row)"
           >
-            批量启用
+            {{ row.status === 1 ? '禁用' : '启用' }}
           </el-button>
-          <el-button
-            v-if="hasPerm('system:user:edit')"
-            :disabled="selectedIds.length === 0"
-            @click="handleBatchStatus(0)"
-          >
-            批量禁用
-          </el-button>
-          <el-button v-if="hasPerm('system:user:export')" @click="handleExport"> 导出 </el-button>
-        </div>
-      </div>
-
-      <!-- 数据表格 -->
-      <el-table
-        v-loading="loading"
-        :data="userList"
-        border
-        stripe
-        style="width: 100%"
-        @selection-change="handleSelectionChange"
-      >
-        <el-table-column type="selection" width="50" align="center" />
-        <el-table-column prop="userId" label="用户ID" width="80" align="center" />
-        <el-table-column prop="username" label="登录账号" min-width="120" />
-        <el-table-column prop="nickName" label="用户昵称" min-width="120" />
-        <el-table-column prop="phone" label="手机号" width="130" />
-        <el-table-column prop="email" label="邮箱" min-width="180" show-overflow-tooltip />
-        <el-table-column prop="roleNames" label="所属角色" min-width="140">
-          <template #default="{ row }">
-            <el-tag
-              v-for="name in row.roleNames"
-              :key="name"
-              size="small"
-              style="margin-right: 4px; margin-bottom: 2px"
-            >
-              {{ name }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="status" label="账号状态" width="100" align="center">
-          <template #default="{ row }">
-            <el-tag :type="row.status === 1 ? 'success' : 'danger'" size="small">
-              {{ row.status === 1 ? '正常' : '禁用' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="createTime" label="创建时间" width="175" />
-        <el-table-column prop="loginTime" label="最后登录" width="175" />
-        <el-table-column label="操作" width="300" fixed="right">
-          <template #default="{ row }">
-            <el-button
-              v-if="hasPerm('system:user:edit')"
-              link
-              type="primary"
-              size="small"
-              @click="openEditDialog(row)"
-            >
-              编辑
-            </el-button>
-            <el-button
-              v-if="hasPerm('system:user:remove')"
-              link
-              type="danger"
-              size="small"
-              @click="handleDelete(row)"
-            >
-              删除
-            </el-button>
-            <el-button
-              v-if="hasPerm('system:user:assign')"
-              link
-              type="primary"
-              size="small"
-              @click="openAssignRoleDialog(row)"
-            >
-              分配角色
-            </el-button>
-            <el-button
-              v-if="hasPerm('system:user:resetPwd')"
-              link
-              type="primary"
-              size="small"
-              @click="openResetPwdDialog(row)"
-            >
-              重置密码
-            </el-button>
-            <el-button
-              v-if="hasPerm('system:user:edit')"
-              link
-              :type="row.status === 1 ? 'warning' : 'success'"
-              size="small"
-              @click="handleToggleStatus(row)"
-            >
-              {{ row.status === 1 ? '禁用' : '启用' }}
-            </el-button>
-          </template>
-        </el-table-column>
-
-        <!-- 空状态 -->
-        <template #empty>
-          <el-empty :description="loading ? '加载中...' : '暂无用户数据'" />
         </template>
-      </el-table>
-
-      <!-- 分页 -->
-      <div class="pagination-wrapper">
-        <el-pagination
-          v-model:current-page="queryParams.page"
-          v-model:page-size="queryParams.pageSize"
-          :page-sizes="[10, 20, 50, 100]"
-          :total="total"
-          layout="total, sizes, prev, pager, next, jumper"
-          background
-          @size-change="fetchData"
-          @current-change="fetchData"
-        />
-      </div>
-    </el-card>
+      </el-table-column>
+    </ProTable>
 
     <!-- 新增 / 编辑用户弹窗 -->
     <el-dialog
@@ -405,6 +376,7 @@
 
 <script setup lang="ts">
   import { ref, reactive, onMounted } from 'vue'
+  import { SearchForm, ProTable } from '@/components/table'
   import { ElMessage, ElMessageBox } from 'element-plus'
   import type { FormInstance } from 'element-plus'
   import {
@@ -817,28 +789,3 @@
     fetchData()
   })
 </script>
-
-<style lang="scss" scoped>
-  .search-card {
-    margin-bottom: 16px;
-  }
-
-  .table-card {
-    :deep(.el-card__body) {
-      padding-bottom: 0;
-    }
-  }
-
-  .table-toolbar {
-    margin-bottom: 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .pagination-wrapper {
-    display: flex;
-    justify-content: flex-end;
-    padding: 20px 0;
-  }
-</style>

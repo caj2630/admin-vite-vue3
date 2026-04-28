@@ -29,6 +29,7 @@
       "Bash(curl -s http://localhost:5173/src/views/home/index.vue)",
       "Bash(kill %1)",
       "Bash(wait %1)"
-    ]
+    ],
+    "additionalDirectories": ["/Volumes/smartT7/code/ai/vite-vue3/src/components/table"]
   }
 }
