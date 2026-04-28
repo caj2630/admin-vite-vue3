@@ -7,6 +7,14 @@ const router = createRouter({
       path: '/',
       name: 'Layout',
       component: () => import('@/components/Layout.vue'),
+      children: [
+        {
+          path: 'chat',
+          name: 'Chat',
+          component: () => import('@/views/chat/index.vue'),
+          meta: { title: 'AI 智能对话' },
+        },
+      ],
     },
     {
       path: '/login',

@@ -23,6 +23,7 @@
     "axios": "^1.15.0",
     "dotenv": "^17.4.2",
     "element-plus": "^2.13.7",
+    "marked": "^18.0.2",
     "nprogress": "^0.2.0",
     "pinia": "^3.0.4",
     "pinia-plugin-persistedstate": "^4.7.1",

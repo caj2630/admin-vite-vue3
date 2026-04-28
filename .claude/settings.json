@@ -30,8 +30,35 @@
       "Bash(kill %1)",
       "Bash(wait %1)",
       "Bash(yarn run *)",
-      "Bash(npx eslint *)"
+      "Bash(npx eslint *)",
+      "Bash(npm install *)",
+      "Bash(npx vite *)",
+      "Bash(node -e \"console.log\\(require\\('/Volumes/smartT7/code/ai/vite-vue3/node/node_modules/express/package.json'\\).version\\)\")",
+      "Bash(echo 'import { handleChatSSE } from '\\\\''./routes/chat.ts'\\\\'' *)",
+      "Bash(rm /tmp/test-export.ts)",
+      "Bash(curl -s -w '\\\\nHTTP_CODE: %{http_code}\\\\n' -X POST https://open.bigmodel.cn/api/paas/v4/chat/completions -H 'Content-Type: application/json' -H 'Authorization: Bearer 098c8a09bb9a46c5a17d9e3a1c3eedaf.O7TKLP1rhKy6K8bJ' -d '{ *)",
+      "Bash(awk '{print $2}')",
+      "Bash(xargs kill *)",
+      "Bash(curl -s --max-time 15 -X POST http://localhost:3333/api/chat -H 'Content-Type: application/json' -d '{\"messages\":[{\"role\":\"user\",\"content\":\"hi\"}]}')",
+      "Bash(echo \"EXIT: $?\")",
+      "Bash(curl -s --max-time 20 -X POST http://localhost:3333/api/chat -H 'Content-Type: application/json' -d '{\"messages\":[{\"role\":\"user\",\"content\":\"hi\"}]}')",
+      "Bash(node --input-type=module -e ' *)",
+      "Bash(pkill -f \"ts-node.*index.ts\")",
+      "Bash(curl -s -N --max-time 20 -X POST http://localhost:3333/api/chat -H 'Content-Type: application/json' -d '{\"messages\":[{\"role\":\"user\",\"content\":\"hi\"}]}')",
+      "Bash(curl -s -N --max-time 15 -X POST http://localhost:3333/api/chat -H 'Content-Type: application/json' -d '{\"messages\":[{\"role\":\"user\",\"content\":\"你好\"}]}')",
+      "Read(//tmp/**)",
+      "Bash(curl -s --max-time 15 -X POST http://localhost:3333/api/chat -H 'Content-Type: application/json' -d '{\"messages\":[{\"role\":\"user\",\"content\":\"你好\"}]}')",
+      "Bash(curl -s --max-time 20 -X POST http://localhost:3333/api/chat -H 'Content-Type: application/json' -d '{\"messages\":[{\"role\":\"user\",\"content\":\"你好，用一句话介绍你自己\"}]}')",
+      "Read(//private/tmp/**)",
+      "Bash(curl -s -N --max-time 20 -X POST http://localhost:3333/api/chat -H 'Content-Type: application/json' -d '{\"messages\":[{\"role\":\"user\",\"content\":\"你好，用一句话介绍你自己\"}]}')",
+      "Bash(curl -s --max-time 20 -X POST http://localhost:3333/api/chat -H 'Content-Type: application/json' -d '{\"messages\":[{\"role\":\"user\",\"content\":\"你好\"}]}')",
+      "Bash(pkill -f \"ts-node.*index\")",
+      "Bash(pkill -f \"vite\")",
+      "Bash(curl -s http://localhost:3333/api/list)"
     ],
-    "additionalDirectories": ["/Volumes/smartT7/code/ai/vite-vue3/src/components/table"]
+    "additionalDirectories": [
+      "/Volumes/smartT7/code/ai/vite-vue3/src/components/table",
+      "/private/tmp"
+    ]
   }
 }

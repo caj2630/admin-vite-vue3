@@ -17,7 +17,7 @@
   import { ref, onMounted } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
   import { ElSkeleton } from 'element-plus'
-  import { HomeFilled, Setting, User, Document } from '@element-plus/icons-vue'
+  import { HomeFilled, Setting, User, Document, ChatLineSquare } from '@element-plus/icons-vue'
   import { isTokenValid } from '@/service'
   import MenuItemComponent from './MenuItemComponent.vue'
   import { useMenuStore } from '@/stores/menu'
@@ -40,6 +40,7 @@
     document: Document,
     user: User,
     home: HomeFilled,
+    chat: ChatLineSquare,
   }
   const menuStore = useMenuStore()
 

@@ -97,6 +97,10 @@ INSERT INTO menus (path, title, parent_id, "order") VALUES
 ('/logs/model', '模型调用日志', (SELECT id FROM menus WHERE path = '/logs'), 2),
 ('/logs/error', '异常日志', (SELECT id FROM menus WHERE path = '/logs'), 3);
 
+-- 聊天机器人（需在 Supabase SQL Editor 中执行）
+INSERT INTO menus (path, name, title, icon, "order") VALUES
+('/chat', 'Chat', 'AI 对话', 'chat', 0);
+
 -- 个人中心子项
 INSERT INTO menus (path, title, parent_id, "order") VALUES
 ('/profile/info', '个人信息', (SELECT id FROM menus WHERE path = '/profile'), 0),

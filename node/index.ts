@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url'
 import { dirname, resolve } from 'path'
 import { createSupabaseClient } from './supabase.ts'
 import userRoutes from './routes/user.ts'
+import chatHandler from './routes/chat.ts'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -123,6 +124,10 @@ router.get('/menus', async (req, res) => {
   res.json({ data: menuTree })
 })
 
+// 智谱 AI 流式聊天
+router.post('/chat', chatHandler)
+
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`)
+  console.log(`[Server] ZHIPU_API_KEY loaded: ${Boolean(process.env.ZHIPU_API_KEY)}`)
 })

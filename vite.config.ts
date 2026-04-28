@@ -7,30 +7,25 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-    vue(),
-    vueJsx(),
-    vueDevTools(),
-  ],
-  css:{
+  plugins: [vue(), vueJsx(), vueDevTools()],
+  css: {
     preprocessorOptions: {
       scss: {
-        additionalData: `@use "@/bem.scss" as *;`
-      }
-    }
+        additionalData: `@use "@/bem.scss" as *;`,
+      },
+    },
   },
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
   server: {
-    // proxy: {
-    //   '/api': {
-    //     target: 'http://localhost:3333',
-    //     changeOrigin: true,
-    //     rewrite: (path) => path.replace(/^\/api/, '/api'),
-    //   },
-    // },
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3333',
+        changeOrigin: true,
+      },
+    },
   },
 })
