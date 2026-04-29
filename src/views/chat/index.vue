@@ -214,7 +214,7 @@
   .chat-container {
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 140px);
+    height: v-bind(height);
     max-width: 1000px;
     margin: 0 auto;
 

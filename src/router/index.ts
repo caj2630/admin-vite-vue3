@@ -7,14 +7,7 @@ const router = createRouter({
       path: '/',
       name: 'Layout',
       component: () => import('@/components/Layout.vue'),
-      children: [
-        {
-          path: 'chat',
-          name: 'Chat',
-          component: () => import('@/views/chat/index.vue'),
-          meta: { title: 'AI 智能对话' },
-        },
-      ],
+      children: [],
     },
     {
       path: '/login',
@@ -25,6 +18,11 @@ const router = createRouter({
       path: '/403',
       name: 'no-permission',
       component: () => import('@/views/templateError/noPermission.vue'),
+    },
+    {
+      path: '/404',
+      name: 'not-found-page',
+      component: () => import('@/views/templateError/notFound.vue'),
     },
     {
       path: '/:pathMatch(.*)*',

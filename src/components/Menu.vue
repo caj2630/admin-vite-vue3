@@ -60,20 +60,20 @@
 
     try {
       // 根据路径动态导入组件
-      // 假设页面文件放在 src/views 目录下
       const modules = import.meta.glob('/src/views/**/*.vue')
+      // 移除开头的斜杠，避免构造路径时出现双斜杠
+      const cleanPath = path.replace(/^\//, '')
 
-      // 构建完整的文件路径
-      const fullPath = `/src/views${path}.vue`
-
+      // 尝试直接匹配: {path}.vue
+      const fullPath = `/src/views/${cleanPath}.vue`
       if (modules[fullPath]) {
         const component: any = await modules[fullPath]()
         componentCache.set(path, component.default)
         return component.default
       }
 
-      // 尝试带 index 的路径
-      const indexPath = `/src/views/${path}/index.vue`
+      // 尝试 index 路径: {path}/index.vue
+      const indexPath = `/src/views/${cleanPath}/index.vue`
       if (modules[indexPath]) {
         const component: any = await modules[indexPath]()
         componentCache.set(path, component.default)
@@ -89,7 +89,11 @@
 
   // 检查路由是否已注册
   const isRouteRegistered = (path: string): boolean => {
-    return router.getRoutes().some((route) => route.path === path || route.name === path)
+    // 去掉前导斜杠进行比较，因为嵌套路由的 path 不带前导斜杠
+    const normalizedPath = path.replace(/^\//, '')
+    return router
+      .getRoutes()
+      .some((route) => route.path === path || route.path === normalizedPath || route.name === path)
   }
 
   // 动态添加路由
@@ -98,11 +102,14 @@
     const routeName = path.replace(/^\//, '').replace(/\//g, '-')
     emits('getCurrentComponent', { path, name: routeName, component }) // 通过事件通知父组件添加路由
 
+    // 嵌套路由的 path 不能以 / 开头
+    const routePath = path.replace(/^\//, '')
+
     // 查找Layout路由，将动态路由添加为Layout的子路由
     const layoutRoute = router.getRoutes().find((route) => route.name === 'Layout')
     if (layoutRoute) {
       router.addRoute('Layout', {
-        path,
+        path: routePath,
         name: routeName,
         component,
         meta: {

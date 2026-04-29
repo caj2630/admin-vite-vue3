@@ -25,19 +25,25 @@ console.log(modules, 'modules')
 const getComponentByPath = (menuPath: string) => {
   // 移除开头的 /
   const cleanPath = menuPath?.replace?.(/^\//, '')
-  // 构建完整路径
+  // 优先查找 index.vue
   const componentPath = `/src/views/${cleanPath}/index.vue`
 
   // 从映射中获取组件
   if (modules[componentPath]) {
     return modules[componentPath]
-  } else {
-    console.warn(`组件路径不存在: ${componentPath}`)
-    return (
-      modules['/src/views/templateError/notFound.vue'] ||
-      (() => import('@/views/templateError/notFound.vue'))
-    )
   }
+
+  // 查找直接 .vue 文件（如 system/user.vue）
+  const directPath = `/src/views/${cleanPath}.vue`
+  if (modules[directPath]) {
+    return modules[directPath]
+  }
+
+  console.warn(`组件路径不存在: ${componentPath}`)
+  return (
+    modules['/src/views/templateError/notFound.vue'] ||
+    (() => import('@/views/templateError/notFound.vue'))
+  )
 }
 export const usePermissionStore = defineStore(
   nameSpace.PERMISSION,
@@ -60,8 +66,10 @@ export const usePermissionStore = defineStore(
         const existingRoute = router.getRoutes().find((r) => r.path === menu.path)
         if (!existingRoute) {
           try {
+            // 嵌套路由的 path 不能以 / 开头，否则会被视为绝对路径
+            const routePath = menu.path.startsWith('/') ? menu.path.slice(1) : menu.path
             router.addRoute('Layout', {
-              path: menu.path,
+              path: routePath,
               name: menu.name,
               component: getComponentByPath(menu.path),
               meta: {
@@ -86,15 +94,7 @@ export const usePermissionStore = defineStore(
       try {
         const result = await get<{ data: MenuItem[] }>('/api/menus')
         if (result.data && Array.isArray(result.data)) {
-          // 过滤无效的菜单项，确保每个菜单项都有必要字段
-          // const data = result.data?.map(menu => {
-          //   return {
-          //     path: menu.path,
-          //     name: menu.name,
-          //     component: modules[`/src/views${menu.path}/index.vue`] || (() => import('@/views/templateError/notFound.vue'))
-          //   }
-          // })
-          const validMenus = result.data //.filter(menu => menu && menu.path && menu.name && menu.component)
+          const validMenus = result.data
           if (validMenus.length === 0) {
             console.warn('API返回的菜单数据中没有有效项:', result.data)
             ElMessage.warning('菜单数据格式不正确')

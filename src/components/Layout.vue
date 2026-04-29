@@ -26,6 +26,9 @@
         </router-view>
         <!-- <slot /> -->
       </el-main>
+
+      <!-- 浮动 AI 聊天入口 -->
+      <FloatingChatbot />
     </el-container>
   </el-container>
 </template>
@@ -34,6 +37,7 @@
   import { ElMessage } from 'element-plus'
   import Menu from './Menu.vue'
   import User from '@/views/login/user.vue'
+  import FloatingChatbot from './FloatingChatbot.vue'
 
   const handleLogout = () => {
     ElMessage.success('已退出登录')
